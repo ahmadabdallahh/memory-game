@@ -11,4 +11,10 @@ type CardTypes = {
     isMatched: boolean;
 };
 
-export type { HeaderTypes, CardTypes }
+type WinMessageProps = {
+    score: number;
+    moves: number;
+    onPlayAgain: () => void;
+};
+
+export type { HeaderTypes, CardTypes, WinMessageProps }

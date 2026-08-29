@@ -1,10 +1,6 @@
 // INFO: Win Message
 
-type WinMessageProps = {
-    score: number;
-    moves: number;
-    onPlayAgain: () => void;
-};
+import type { WinMessageProps } from "../utils/types";
 
 const getTrophy = (moves: number) => {
     if (moves <= 50) return "🏆"; // Perfect play - minimal moves
