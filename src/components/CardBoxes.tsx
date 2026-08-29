@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { HeaderTypes, CardTypes } from "../utils/types";
 import Header from "./Header";
+import WinMessage from "./WinMessage";
 
 const cardValues = [
     "🍎", "🍌", "🍒", "🍇", "🍊", "🍓", "🫐", "🍍",
@@ -26,6 +27,7 @@ const CardBoxes = () => {
     const [flippedCards, setFlippedCards] = useState<CardTypes[]>([]);
     const [data, setData] = useState<HeaderTypes>({ score: 0, moves: 0 });
 
+    const isWon = cards.length > 0 && cards.every((card) => card.isMatched);
 
     const handleNewGame = () => {
         setCards(createInitialBoard());
@@ -93,6 +95,8 @@ const CardBoxes = () => {
     return (
         <>
             <Header score={data.score} moves={data.moves} onClick={handleNewGame} />
+
+            {isWon && <WinMessage score={data.score} moves={data.moves} onPlayAgain={handleNewGame} />}
 
             <div className={`grid grid-cols-4 gap-3.5 max-w-md mx-auto p-5 bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-2xl shadow-2xl`}>
                 {cards.map((card) => {
