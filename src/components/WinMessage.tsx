@@ -7,8 +7,8 @@ type WinMessageProps = {
 };
 
 const getTrophy = (moves: number) => {
-    if (moves <= 12) return "🏆"; // Perfect play - minimal moves
-    if (moves <= 20) return "🥇"; // Great play
+    if (moves <= 50) return "🏆"; // Perfect play - minimal moves
+    if (moves <= 70) return "🥇"; // Great play
     return "🎉"; // Completed the game
 };
 
