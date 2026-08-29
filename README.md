@@ -137,9 +137,9 @@ flowchart LR
     end
 
     subgraph State Management [CardBoxes Local State]
-        S1[cards: CardTypes[]]
-        S2[flippedCards: CardTypes[]]
-        S3[data: HeaderTypes score/moves]
+        S1["cards - CardTypes[]"]
+        S2["flippedCards - CardTypes[]"]
+        S3["data - HeaderTypes (score / moves)"]
     end
 
     subgraph Logic
