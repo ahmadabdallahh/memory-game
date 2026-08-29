@@ -49,7 +49,7 @@ Test your memory and concentration with this classic matching game! Flip over th
 
 ## Live Demo
 
-> _Coming soon — deploy to Vercel / Netlify / GitHub Pages._
+> **Play it live:** [https://memory-game-kohl-sigma.vercel.app](https://memory-game-kohl-sigma.vercel.app)
 
 ---
 
@@ -73,10 +73,16 @@ memory-game/
 │   └── favicon.svg
 ├── src/
 │   ├── components/
-│   │   ├── CardBoxes.tsx      # Game board + core game logic
-│   │   └── Header.tsx         # Score, moves & "New Game" button
+│   │   ├── CardBoxes.tsx      # Container: composes header, board & win screen
+│   │   ├── Header.tsx         # Score, moves & "New Game" button
+│   │   ├── GameBoard.tsx      # Grid that renders each GameCard
+│   │   ├── GameCard.tsx       # Single flip-card UI (button + styles)
+│   │   └── WinMessage.tsx     # Win overlay with score/moves & Play Again
+│   ├── hooks/
+│   │   └── useMemoryGame.ts   # All game state & rules (custom hook)
 │   ├── utils/
-│   │   └── types.ts           # Shared TypeScript types
+│   │   ├── types.ts           # Shared TypeScript types
+│   │   └── gameLogic.ts       # Card values + createInitialBoard (pure)
 │   ├── App.tsx                # Root component
 │   ├── main.tsx               # Entry point
 │   └── index.css              # Tailwind + global styles
@@ -92,11 +98,11 @@ memory-game/
 
 ## How It Works
 
-The game centers around a single stateful component, **`CardBoxes`**, which manages:
+The game is split into a **stateful custom hook** and **presentational components**:
 
-1. **`cards`** — the full board as a `CardTypes[]` array
-2. **`flippedCards`** — currently revealed cards (max 2)
-3. **`data`** — the score & moves tracked in the header
+1. **`useMemoryGame`** (hook) — owns all state: `cards`, `flippedCards`, and `data` (score & moves), plus the game rules.
+2. **`CardBoxes`** (container) — calls the hook and composes `<Header>`, `<GameBoard>`, and `<WinMessage>`.
+3. **`GameBoard` / `GameCard`** (UI) — render the 4×4 grid with no game logic.
 
 Each card is a `CardTypes` object with an id, a fruit emoji, and two boolean flags.
 
@@ -166,9 +172,9 @@ flowchart LR
 
 The root of the app — currently just wraps `CardBoxes`, keeping the structure ready for future expansion (global context, routing, etc.).
 
-### `CardBoxes.tsx` _(the heart of the game)_
+### `useMemoryGame.ts` _(state & rules)_
 
-- Creates & shuffles the initial board using **lazy state initialization**:
+- Creates & shuffles the board via **lazy state initialization** to avoid `useEffect`:
   ```tsx
   const [cards, setCards] = useState<CardTypes[]>(createInitialBoard);
   ```
@@ -177,6 +183,19 @@ The root of the app — currently just wraps `CardBoxes`, keeping the structure 
   2. Flips the selected card
   3. On the 2nd card, checks a match
   4. Marks matches green, or auto-flips back after 800ms on a mismatch
+- `handleNewGame()` resets the board, selection, score and moves.
+
+### `CardBoxes.tsx` _(container)_
+
+Pulls everything from `useMemoryGame` and renders `<Header>`, `<GameBoard>` and (when won) `<WinMessage>`.
+
+### `GameCard.tsx` & `GameBoard.tsx` _(UI)_
+
+`GameBoard` renders the 4×4 grid and maps each card to a `GameCard`. `GameCard` is a single button that shows the emoji when flipped/matched, otherwise a question mark.
+
+### `WinMessage.tsx`
+
+Celebration overlay shown when all pairs are matched — animated trophy, falling confetti, the final score/moves, and a **Play Again** button.
 
 ### `Header.tsx`
 
@@ -190,7 +209,7 @@ Displays `score` and `moves` in a polished card beside the title, plus a **"New 
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/<your-username>/memory-game.git
+git clone https://github.com/ahmadabdallahh/memory-game.git
 cd memory-game
 
 # 2. Install dependencies
@@ -241,6 +260,12 @@ type CardTypes = {
   isFlipped: boolean;
   isMatched: boolean;
 };
+
+type WinMessageProps = {
+  score: number;
+  moves: number;
+  onPlayAgain: () => void;
+};
 ```
 
 | Field       | Purpose                                   |
@@ -254,8 +279,6 @@ type CardTypes = {
 
 ## Future Improvements
 
-- [ ] Win-screen / celebration when all pairs are matched
-- [ ] Play-again button that resets the board without a full reload
 - [ ] Timer & difficulty levels (6×6 grid, themes)
 - [ ] Move counter + score persistence with `localStorage`
 - [ ] Sound effects & flip animations using CSS 3D transforms
